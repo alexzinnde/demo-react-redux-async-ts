@@ -1,26 +1,32 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import {useAppDispatch, useAppSelector} from './app/hooks'
+import {getUsers, clearUsers} from './redux'
+
+import Button from './components/Button'
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	const dispatch = useAppDispatch()
+	const users = useAppSelector(state => state.users.users)
+
+	const getButtonText = () => {
+		console.log('in getButtonText, users.length', users.length)
+		return users.length > 1 ? 'Clear Users' : 'Get Users'
+	}
+
+	const handleClick = async () => {
+		if (users.length === 0) {
+			const res = await dispatch(getUsers()).unwrap()
+			console.log('res.data', res.data)
+		} else {
+			dispatch(clearUsers())
+		}
+	}
+	return (
+		<div style={{height: '95vh', width: '98vw', display: 'flex', margin: 'auto', justifyContent: 'center', alignItems: 'center'}}>
+			<Button text={getButtonText()} handleClick={handleClick} />
+			<div>{users.length > 1 && users.map(user => <p key={user.id}>{user.name}</p>)}</div>
+		</div>
+	)
 }
 
-export default App;
+export default App
